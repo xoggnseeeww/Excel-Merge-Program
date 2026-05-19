@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * app/page.tsx — 메인 페이지
  *
@@ -7,7 +9,6 @@
  *  - re_validating 상태 감지 → handleReValidate() 자동 호출 (#7,#8)
  */
 
-'use client';
 
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';

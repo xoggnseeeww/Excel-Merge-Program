@@ -1,3 +1,5 @@
+'use client';
+
 import { logger } from '@/lib/logger';
 /**
  * store/useMergeAction.ts — 병합 오케스트레이터 훅 (Sprint 6 업데이트)
@@ -8,7 +10,6 @@ import { logger } from '@/lib/logger';
  *  - Worker 인스턴스 Store 보관 → abortMerge() 연동
  */
 
-'use client';
 
 import { useCallback } from 'react';
 import { useAppStore } from './useAppStore';
