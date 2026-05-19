@@ -18,7 +18,7 @@ import { parsePreview, parseSheetMeta } from '@/features/excel/parser';
 import { runMerge, downloadBuffer } from '@/features/excel/merger';
 import { runMergeInWorker } from '@/features/excel/merger/workerBridge';
 import { ModeAHeaderMismatchError } from '@/features/excel/merger/modeA';
-import type { ManagedFile } from '@/types';
+import type { ManagedFile, Telemetry } from '@/types';
 import { estimateMemoryUsageBytes, OOM_HEAP_LIMIT_BYTES } from '@/lib/utils';
 
 const WORKER_THRESHOLD_BYTES = 10 * 1024 * 1024;
@@ -139,7 +139,7 @@ export function useMergeAction() {
         fileName: string;
         totalRows: number;
         warnings: Array<{ fileId: string; fileName: string; errorCode: Parameters<typeof store.pushWarning>[0]['errorCode']; message: string }>;
-        telemetry: Partial<typeof store.telemetry>;
+        telemetry: Partial<Telemetry>;
       };
 
       if (needsWorker) {

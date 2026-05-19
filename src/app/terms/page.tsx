@@ -66,7 +66,7 @@ export default function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-base font-semibold text-slate-800">제8조 (문의)</h2>
           <div className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-3">
-            이메일: <span className="text-slate-400">[xogns022@gmail.com]</span>
+            이메일: <span className="text-slate-400">xogns022@gmail.com</span>
           </div>
         </section>
       </div>

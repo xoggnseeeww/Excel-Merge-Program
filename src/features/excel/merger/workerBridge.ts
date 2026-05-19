@@ -43,7 +43,7 @@ async function serializeFiles(files: ManagedFile[]): Promise<{
 
   for (const f of files) {
     if (f.status !== 'valid') continue;
-    const buffer = await f.file.arrayBuffer();
+    const buffer = (await f.file.arrayBuffer()) as ArrayBuffer;
     serialized.push({
       id: f.id,
       name: f.file.name,

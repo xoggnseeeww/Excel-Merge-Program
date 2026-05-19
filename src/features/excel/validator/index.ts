@@ -53,7 +53,7 @@ function startsWith(header: Uint8Array, magic: Uint8Array): boolean {
 }
 
 async function readHeader(file: File, bytes: number): Promise<Uint8Array> {
-  return new Uint8Array(await file.slice(0, bytes).arrayBuffer());
+  return new Uint8Array((await file.slice(0, bytes).arrayBuffer()) as ArrayBuffer);
 }
 
 /**

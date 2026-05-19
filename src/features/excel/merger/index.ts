@@ -172,20 +172,20 @@ export async function runMerge(
       totalRows = result.totalRows;
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, result.worksheet, 'Merged');
-      outputBuffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;
+      outputBuffer = (XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as Uint8Array).buffer.slice(0) as ArrayBuffer;
 
     } else if (opts.mode === 'B') {
       const result = mergeB(inputs, { includeSourceFile: opts.includeSourceFile });
       totalRows = result.totalRows;
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, result.worksheet, 'Merged');
-      outputBuffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;
+      outputBuffer = (XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as Uint8Array).buffer.slice(0) as ArrayBuffer;
 
     } else {
       // Mode C
       const result = mergeC(inputs);
       totalRows = result.totalSheets; // Mode C는 행 대신 시트 수
-      outputBuffer = XLSX.write(result.workbook, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;
+      outputBuffer = (XLSX.write(result.workbook, { type: 'array', bookType: 'xlsx' }) as Uint8Array).buffer.slice(0) as ArrayBuffer;
     }
   } catch (err) {
     // OOM / 알 수 없는 Fatal → 상위(Store)에서 failed 전이 처리

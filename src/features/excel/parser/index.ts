@@ -258,7 +258,7 @@ export async function parseFile(
   opts: ParseOptions,
 ): Promise<ParseResult> {
   const requiresWorker = file.size > WORKER_THRESHOLD_BYTES;
-  const buf = await file.arrayBuffer();
+  const buf = (await file.arrayBuffer()) as ArrayBuffer;
 
   let result: Omit<ParseResult, 'requiresWorker'>;
 
@@ -282,7 +282,7 @@ export async function parseSheetMeta(file: File, extension: SupportedExtension):
     return { sheetNames: [file.name.replace(/\.csv$/i, '')], requiresWorker };
   }
 
-  const buf = await file.arrayBuffer();
+  const buf = (await file.arrayBuffer()) as ArrayBuffer;
   // SheetJS: SheetNames 추출만 — 셀 파싱 없음
   const wb = XLSX.read(buf, { type: 'array', bookSheets: true });
   return { sheetNames: wb.SheetNames, requiresWorker };
@@ -297,7 +297,7 @@ export async function parsePreview(
   extension: SupportedExtension,
   sheetIndex = 0,
 ): Promise<PreviewData> {
-  const buf = await file.arrayBuffer();
+  const buf = (await file.arrayBuffer()) as ArrayBuffer;
   let ws: XLSX.WorkSheet | undefined;
 
   if (extension === 'csv') {
