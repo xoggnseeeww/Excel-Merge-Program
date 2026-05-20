@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import * as XLSX from 'xlsx';
 import type { ManagedFile, MergeMode, MergeWarning, Telemetry } from '@/types';
 import { parseFile } from '../parser';
+import type { SheetData } from '../parser';
 import { mergeA, ModeAHeaderMismatchError } from './modeA';
 import { mergeB } from './modeB';
 import { mergeC } from './modeC';
