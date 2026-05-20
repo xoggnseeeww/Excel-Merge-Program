@@ -37,7 +37,7 @@ export function WarningLog() {
               <span className="flex-none text-xs font-medium text-amber-600">
                 {ERROR_LABELS[w.errorCode] ?? w.errorCode}
               </span>
-              <span className="text-xs text-amber-700 truncate">{w.message}</span>
+              <span className="text-xs text-amber-700 break-words min-w-0">{w.message}</span>
             </li>
           ))}
         </ul>

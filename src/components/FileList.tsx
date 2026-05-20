@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import {
   DndContext, closestCenter, PointerSensor,
   useSensor, useSensors, DragEndEvent,
 } from '@dnd-kit/core';
 import {
   SortableContext, useSortable,
-  verticalListSortingStrategy, arrayMove,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { ManagedFile } from '@/types';
@@ -22,7 +21,7 @@ const STATUS_CONFIG = {
   skipped: { label: '스킵', cls: 'bg-amber-100 text-amber-600' },
 } as const;
 
-// ─── 단일 파일 행 (Sortable) ──────────────────
+// ─── 단일 파일 행 ─────────────────────────────
 
 function SortableFileRow({ file, index, onRemove }: {
   file: ManagedFile;
@@ -38,7 +37,7 @@ function SortableFileRow({ file, index, onRemove }: {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const cfg = STATUS_CONFIG[file.status];
+  const cfg    = STATUS_CONFIG[file.status];
   const sizeKb = (file.file.size / 1024).toFixed(0);
 
   return (
@@ -46,16 +45,16 @@ function SortableFileRow({ file, index, onRemove }: {
       ref={setNodeRef}
       style={style}
       className={[
-        'flex items-center gap-3 rounded-lg border px-3 py-2.5',
+        'flex items-center gap-2 sm:gap-3 rounded-lg border px-2.5 sm:px-3 py-2.5',
         'bg-white transition-shadow',
         isDragging ? 'shadow-lg border-emerald-200' : 'border-slate-100 hover:border-slate-200',
       ].join(' ')}
     >
-      {/* 드래그 핸들 */}
+      {/* 드래그 핸들 — 모바일에서도 touch-none 유지 */}
       <button
         {...attributes}
         {...listeners}
-        className="flex-none cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-400 touch-none"
+        className="flex-none cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-400 touch-none p-0.5"
         aria-label="드래그하여 순서 변경"
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -64,32 +63,35 @@ function SortableFileRow({ file, index, onRemove }: {
       </button>
 
       {/* 순번 */}
-      <span className="flex-none w-5 text-xs font-mono text-slate-300">{index + 1}</span>
+      <span className="flex-none w-4 text-xs font-mono text-slate-300">{index + 1}</span>
 
       {/* 파일명 */}
       <span className="flex-1 min-w-0 text-sm text-slate-700 truncate" title={file.file.name}>
         {file.file.name}
       </span>
 
-      {/* 크기 */}
-      <span className="flex-none text-xs text-slate-400 tabular-nums">{sizeKb}KB</span>
+      {/* 크기 — 모바일에서 숨김 */}
+      <span className="hidden sm:inline flex-none text-xs text-slate-400 tabular-nums">{sizeKb}KB</span>
 
       {/* 상태 배지 */}
       <span className={`flex-none rounded-full px-2 py-0.5 text-xs font-medium ${cfg.cls}`}>
         {cfg.label}
       </span>
 
-      {/* 오류 메시지 */}
+      {/* 오류 메시지 — 모바일에서 숨김 (title 속성으로 접근) */}
       {file.errorMessage && (
-        <span className="flex-none text-xs text-red-500 max-w-[120px] truncate" title={file.errorMessage}>
+        <span
+          className="hidden sm:inline flex-none text-xs text-red-500 max-w-[120px] truncate"
+          title={file.errorMessage}
+        >
           {file.errorMessage}
         </span>
       )}
 
-      {/* 삭제 버튼 */}
+      {/* 삭제 버튼 — 모바일 탭 영역 44px */}
       <button
         onClick={() => onRemove(file.id)}
-        className="flex-none rounded p-1 text-slate-300 hover:text-red-400 hover:bg-red-50 transition-colors"
+        className="flex-none rounded p-1.5 text-slate-300 hover:text-red-400 hover:bg-red-50 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
         aria-label={`${file.file.name} 제거`}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,12 +102,12 @@ function SortableFileRow({ file, index, onRemove }: {
   );
 }
 
-// ─── 파일 목록 (DnD 컨테이너) ─────────────────
+// ─── 파일 목록 ────────────────────────────────
 
 export function FileList() {
-  const files = useAppStore((s) => s.files);
-  const removeFile = useAppStore((s) => s.removeFile);
-  const reorderFiles = useAppStore((s) => s.reorderFiles); // #8
+  const files       = useAppStore((s) => s.files);
+  const removeFile  = useAppStore((s) => s.removeFile);
+  const reorderFiles = useAppStore((s) => s.reorderFiles);
 
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: { distance: 5 },
@@ -117,18 +119,21 @@ export function FileList() {
     const oldIdx = files.findIndex((f) => f.id === active.id);
     const newIdx = files.findIndex((f) => f.id === over.id);
     if (oldIdx < 0 || newIdx < 0) return;
-    reorderFiles(oldIdx, newIdx); // → Store → re_validating 트리거 (#8)
+    reorderFiles(oldIdx, newIdx);
   };
 
   if (files.length === 0) return null;
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
         <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
           파일 목록 ({files.length}개)
         </p>
-        <p className="text-xs text-slate-400">드래그로 순서 변경 · Mode A 기준 헤더 = 1번 파일</p>
+        <p className="text-xs text-slate-400 text-right leading-tight">
+          <span className="hidden sm:inline">드래그로 순서 변경 · </span>
+          Mode A 기준 헤더 = 1번 파일
+        </p>
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
