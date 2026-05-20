@@ -57,18 +57,6 @@ export interface MetaParseResult {
 }
 
 
-function isValidUtf8(buf: Uint8Array): boolean {
-  try {
-    new TextDecoder('utf-8', { fatal: true }).decode(buf);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- */
-
 // ─────────────────────────────────────────────
 // 헤더 정규화
 // ─────────────────────────────────────────────
@@ -206,7 +194,7 @@ function parseWorkbook(
 
     // 숨김 시트 처리
     const visibility = wb.Workbook?.Sheets?.find((s) => s.name === name)?.Hidden;
-    if (!includeHiddenSheets && visibility && visibility !== 0) continue;
+    if (!includeHiddenSheets && visibility !== undefined && visibility !== 0) continue;
 
     const sheetData = parseSheet(ws, name);
     if (sheetData.headers.length === 0 && sheetData.rows.length === 0) {

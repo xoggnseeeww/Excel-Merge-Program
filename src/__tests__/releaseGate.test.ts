@@ -106,19 +106,16 @@ describe('Performance Gate — 3초 기준', () => {
 // ─────────────────────────────────────────────
 
 describe('포맷 교차 병합 — SheetData 레벨', () => {
-  it('xlsx + csv 출처 SheetData → Mode B union 병합', () => {
+  it('xlsx + csv 출처 SheetData → Mode B union 병합', async () => {
     const inputs = [
       { fileId: '1', fileName: 'data.xlsx', sheets: [makeSheet(['이름', '나이'], [['홍', 30]])] },
       { fileId: '2', fileName: 'data.csv',  sheets: [makeSheet(['이름', '부서'], [['김', '개발']])] },
     ];
     const { worksheet } = mergeB(inputs, { includeSourceFile: true });
-    const data = [] as unknown[][];
-    // XLSX 유틸로 검증
-    import('xlsx').then((XLSX) => {
-      const rows = XLSX.utils.sheet_to_json<unknown[]>(worksheet, { header: 1 });
-      expect(rows[0]).toContain('source_file');
-      expect(rows[0]).toContain('이름');
-    });
+    const XLSX = await import('xlsx');
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(worksheet, { header: 1 });
+    expect(rows[0]).toContain('source_file');
+    expect(rows[0]).toContain('이름');
   });
 });
 

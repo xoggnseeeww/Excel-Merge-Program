@@ -64,7 +64,7 @@ export function runMergeInWorker(
 ): Promise<WorkerMergeResult> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(
-      new URL('@/workers/mergeWorker.ts', import.meta.url),
+      new URL('../../workers/mergeWorker.ts', import.meta.url),
       { type: 'module' },
     );
 

@@ -154,7 +154,7 @@ self.onmessage = async (e: MessageEvent<WorkerInMessage>) => {
       warnings: result.warnings,
       telemetry: result.telemetry,
     };
-    self.postMessage(out, [result.buffer]);
+    self.postMessage(out, { transfer: [result.buffer] });
 
   } catch (err) {
     stopOomPolling();

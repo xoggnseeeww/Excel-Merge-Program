@@ -13,7 +13,6 @@ import { logger } from '@/lib/logger';
 import * as XLSX from 'xlsx';
 import type { ManagedFile, MergeMode, MergeWarning, Telemetry } from '@/types';
 import { parseFile } from '../parser';
-import type { SheetData } from '../parser';
 import { mergeA, ModeAHeaderMismatchError } from './modeA';
 import { mergeB } from './modeB';
 import { mergeC } from './modeC';
@@ -36,28 +35,6 @@ export interface MergeResult {
   totalRows: number;
   warnings: MergeWarning[];
   telemetry: Partial<Telemetry>;
-}
-
-// ─────────────────────────────────────────────
-// 파일 → SheetData[] 변환 헬퍼
-// ─────────────────────────────────────────────
-
-async function toSheetDataList(
-  file: ManagedFile,
-  opts: MergeOptions,
-): Promise<SheetData[]> {
-  const parsed = await parseFile(file.file, {
-    extension: file.extension,
-    includeHiddenSheets: opts.includeHiddenSheets,
-    targetSheetIndices: file.selectedSheetIndices,
-  });
-
-  if (parsed.hasEmptySheet) {
-    // E005는 warning — 전체 중단 없음
-    logger.warn(`[Merger] 빈 시트 발견: ${file.file.name}`);
-  }
-
-  return parsed.sheets;
 }
 
 // ─────────────────────────────────────────────
@@ -222,5 +199,6 @@ export function downloadBuffer(buffer: ArrayBuffer, fileName: string): void {
   a.href = url;
   a.download = fileName;
   a.click();
-  URL.revokeObjectURL(url);
+  // Firefox 등에서 비동기 다운로드 시작 대기
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }

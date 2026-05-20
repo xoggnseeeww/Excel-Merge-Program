@@ -117,7 +117,7 @@ export async function validateFile(
   // 5. 중복 (#11: SHA-256 firstKB)
   const fileKey = await generateFileKey(file);
   if (seenKeys.has(fileKey)) {
-    return { valid: false, errorMessage: `중복 파일 스킵: ${file.name}`, detectedFormat, extension: rawExt, isDuplicate: true };
+    return { valid: false, errorCode: 'E002', errorMessage: `중복 파일 스킵: ${file.name}`, detectedFormat, extension: rawExt, isDuplicate: true };
   }
   seenKeys.add(fileKey);
 

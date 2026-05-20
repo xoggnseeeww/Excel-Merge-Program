@@ -18,8 +18,8 @@ import type {
 
 const VALID_TRANSITIONS: Record<AppStatus, AppStatus[]> = {
   idle:          ['validating'],
-  validating:    ['parsing', 'idle'],
-  parsing:       ['preview_ready', 'failed'],
+  validating:    ['parsing', 'idle', 'failed'],
+  parsing:       ['preview_ready', 'failed', 'idle'],
   preview_ready: ['re_validating', 'merging'],
   re_validating: ['parsing', 'idle'],
   merging:       ['completed', 'failed', 'idle'],  // idle = abort
@@ -59,6 +59,7 @@ interface AppStore {
   // ── Actions: 상태 전이 ────────────────────
   transitionTo: (next: AppStatus, trigger?: ReValidatingTrigger) => void;
   setFatalError: (message: string) => void;
+  clearFatalError: () => void;
 
   // ── Actions: 파일 관리 ────────────────────
   addFiles: (files: ManagedFile[]) => void;
@@ -130,6 +131,8 @@ export const useAppStore = create<AppStore>()(
           {
             status: next,
             reValidatingTrigger: next === 're_validating' ? (trigger ?? null) : null,
+            // idle 진입 시 에러/경고 초기화
+            ...(next === 'idle' && { fatalError: null, warnings: [] }),
             // re_validating 진입 시 이전 preview 초기화
             ...(next === 're_validating' && { previewData: null }),
             // completed/failed 진입 시 worker 정리
@@ -142,6 +145,9 @@ export const useAppStore = create<AppStore>()(
 
       setFatalError: (message) =>
         set({ fatalError: message }, false, 'setFatalError'),
+
+      clearFatalError: () =>
+        set({ fatalError: null }, false, 'clearFatalError'),
 
       // ── 파일 관리 ──────────────────────────
       addFiles: (incoming) => {
@@ -238,12 +244,16 @@ export const useAppStore = create<AppStore>()(
         set({ _worker: worker }, false, 'setWorker'),
 
       abortMerge: () => {
-        const { _worker } = get();
+        const { _worker, status } = get();
         if (_worker) {
           _worker.terminate();
         }
         set({ _worker: null }, false, 'abortMerge');
-        get().transitionTo('idle');
+        // merging 또는 다른 중단 가능 상태에서만 idle 전이
+        const abortable: AppStatus[] = ['merging', 'validating', 'parsing', 're_validating'];
+        if (abortable.includes(status)) {
+          get().transitionTo('idle');
+        }
       },
 
       // ── Reset ──────────────────────────────

@@ -11,7 +11,7 @@ export function WarningLog() {
   const fatalError  = useAppStore((s) => s.fatalError);
   const status      = useAppStore((s) => s.status);
 
-  const hasFatal = status === 'failed' && fatalError;
+  const hasFatal = fatalError != null && fatalError !== '';
   if (!hasFatal && warnings.length === 0) return null;
 
   return (

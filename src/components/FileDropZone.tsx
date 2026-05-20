@@ -11,9 +11,8 @@ export function FileDropZone({ onFiles, disabled }: FileDropZoneProps) {
   const [dragging, setDragging] = useState(false);
 
   const extract = (items: DataTransferItemList | FileList): File[] => {
-    const files: File[] = [];
     const src = 'length' in items ? Array.from(items as FileList) : Array.from(items as DataTransferItemList).map((i) => i.getAsFile()).filter(Boolean) as File[];
-    return [...files, ...src];
+    return src;
   };
 
   const onDrop = useCallback((e: React.DragEvent) => {
